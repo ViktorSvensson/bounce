@@ -9,10 +9,7 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND.
  */
-
 import bounce from "./bounce";
-
-export {bounce, Bounce} from "./bounce";
-export type {BounceModule} from "./bounce";
-
+export { bounce, Bounce } from "./bounce";
+export type { BounceModule } from "./bounce";
 export default bounce;

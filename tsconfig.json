@@ -7,8 +7,9 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "moduleResolution": "node",
+    "declaration": true,
     "sourceMap": true,
-    "outDir": "dist",
+    "outDir": "lib",
     "rootDir": "src",
     "typeRoots": ["node_modules/@types", "index.d.ts"],
     "strict": true,
@@ -16,5 +17,6 @@
     "strictFunctionTypes": true,
     "lib": ["ESNext", "DOM"]
   },
-  "include": ["src/**/*"]
+  "include": ["src/*", "src/**/*", "src/**/**/*"],
+  "exclude": ["src/*.test.ts"]
 }
