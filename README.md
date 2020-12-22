@@ -2,8 +2,8 @@
 
 A simple module that lets you build chained encoder/decoder functions.
 
-
 ## Installation
+
 ```bash
 npm install @floss/bounce
 ```
