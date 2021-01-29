@@ -1,8 +1,12 @@
 # @floss/bounce
 
-Lets you build chained encoder/decoder functions.
+An implementation of the _command design pattern_. Takes an arbitrary list of undoable actions and combines them into one undoable action.
 
 ## Installation
+
+```bash
+yarn add @floss/bounce
+```
 
 ```bash
 npm install @floss/bounce
@@ -10,33 +14,41 @@ npm install @floss/bounce
 
 ## Usage
 
-As an example, we're going to construct a module that converts any input to JSON and then to base64.
+```typescript
+import bounce from "@floss/bounce";
+const action = bounce([
+  {
+    apply: (x) => x + 1,
+    restore: (y) => y - 1,
+  },
+  {
+    apply: (x) => x * 2,
+    restore: (y) => y / 2,
+  },
+]);
+```
 
-**# 1:** Define two objects, each implementing an `apply()` and a `restore()` method. Basically, everything that `apply()` does is returned to its original state by `restore()`.
+## Example
+
+We're going to construct a module that converts any input to to base64.
+
+**# 1:** Define two objects, each implementing an `apply()` and a `restore()` method. Anything that `apply()` does must be undone by `restore()`.
 
 ```javascript
-const Base64Module = {
-  // ascii -> base64
-  apply: (input) => Buffer.from(input, "ascii").toString("base64"),
-  // base64 -> ascii
-  restore: (output) => Buffer.from(output, "base64").toString("ascii"),
-}
-
-const JsonModule = {
-  // any -> json string
-  apply: (input) => JSON.stringify(input),
-  // json string -> any
-  restore: (output) => JSON.parse(output),
-}
+const ToBase64 = {
+  apply: (value) => Buffer.from(value, "utf8").toString("base64"),
+  restore: (value) => Buffer.from(value, "base64").toString("utf8"),
+};
+const ToJson = {
+  apply: (value) => JSON.stringify(value),
+  restore: (value) => JSON.parse(value),
+};
 ```
 
 **# 2:** Create a Bounce instance and try it out!
 
 ```javascript
-const encoder = bounce(
-  JsonModule, 
-  Base64Module
-);
+const encoder = bounce([ToBase64, ToJson]);
 
 const encoded = bounce.apply({hello: 10});
 // => eyJoZWxsbyI6MTB9
