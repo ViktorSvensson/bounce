@@ -14,7 +14,7 @@ npm install @floss/bounce
 
 ## Usage
 
-```typescript
+```javascript
 import bounce from "@floss/bounce";
 const action = bounce([
   {
@@ -26,6 +26,8 @@ const action = bounce([
     restore: (y) => y / 2,
   },
 ]);
+console.log(action.apply(1)); // => 4
+console.log(action.restore(4)); // => 1
 ```
 
 ## Example
@@ -35,20 +37,20 @@ We're going to construct a module that converts any input to to base64.
 **# 1:** Define two objects, each implementing an `apply()` and a `restore()` method. Anything that `apply()` does must be undone by `restore()`.
 
 ```javascript
-const ToBase64 = {
-  apply: (value) => Buffer.from(value, "utf8").toString("base64"),
-  restore: (value) => Buffer.from(value, "base64").toString("utf8"),
-};
 const ToJson = {
   apply: (value) => JSON.stringify(value),
   restore: (value) => JSON.parse(value),
+};
+const ToBase64 = {
+  apply: (value) => Buffer.from(value, "utf8").toString("base64"),
+  restore: (value) => Buffer.from(value, "base64").toString("utf8"),
 };
 ```
 
 **# 2:** Create a Bounce instance and try it out!
 
 ```javascript
-const encoder = bounce([ToBase64, ToJson]);
+const encoder = bounce([ToJson, ToBase64]);
 
 const encoded = bounce.apply({hello: 10});
 // => eyJoZWxsbyI6MTB9

@@ -38,25 +38,21 @@ const JsonActionObject: BounceAction = {
   restore: (value) => JSON.parse(value),
 };
 describe("bounce", () => {
-  test("should convert a string to/from base64", () => {
+  test("converts a string to/from base64", () => {
     const bounce = Bounce.create<string, string>([new Base64Action()]);
     const encoded = bounce.apply("hello");
     const restored = bounce.restore(encoded);
     expect(encoded).toEqual("aGVsbG8=");
     expect(restored).toEqual("hello");
   });
-  test("should convert an object => json => b64", () => {
-    const bounce = Bounce.create<{hello: number}, string>([
-      new JsonAction(),
-      new Base64Action(),
-    ]);
+  test("converts an object => json => b64", () => {
+    const bounce = Bounce.create([new JsonAction(), new Base64Action()]);
     const encoded = bounce.apply({hello: 10});
     const restored = bounce.restore(encoded);
     expect(encoded).toEqual("eyJoZWxsbyI6MTB9");
     expect(restored).toStrictEqual({hello: 10});
-    console.dir(bounce);
   });
-  test("should work using objects instead of classes", () => {
+  test("works using objects instead of classes", () => {
     const bounce = Bounce.create<{hi: number}, string>([
       JsonActionObject,
       Base64ActionObject,
@@ -66,7 +62,7 @@ describe("bounce", () => {
     expect(encoded).toEqual("eyJoaSI6MTV9");
     expect(restored).toStrictEqual({hi: 15});
   });
-  test("should work via default export", () => {
+  test("works via default export", () => {
     const bounce = B<{hola: number}, string>([
       JsonActionObject,
       Base64ActionObject,
@@ -75,5 +71,15 @@ describe("bounce", () => {
     const restored = bounce.restore(encoded);
     expect(encoded).toEqual("eyJob2xhIjoxOX0=");
     expect(restored).toStrictEqual({hola: 19});
+  });
+  test("can be used as map predicate", () => {
+    const bounce = B<{hola: number}, string>([
+      JsonActionObject,
+      Base64ActionObject,
+    ]);
+    const encoded = [{hola: 19}].map(bounce.apply);
+    const restored = encoded.map(bounce.restore);
+    expect(encoded).toStrictEqual(["eyJob2xhIjoxOX0="]);
+    expect(restored).toStrictEqual([{hola: 19}]);
   });
 });

@@ -32,7 +32,7 @@ export class Bounce<I = any, O extends any = I> implements BounceAction<I, O> {
    *
    * @param actions
    */
-  constructor(protected readonly actions: BounceAction[]) {}
+  constructor(protected readonly actions: BounceAction<I | unknown, O>[]) {}
 
   /**
    * Invokes each bounce module sequentially, and returns
@@ -43,9 +43,9 @@ export class Bounce<I = any, O extends any = I> implements BounceAction<I, O> {
    * @returns apply
    */
   public apply(input: I): O {
-    let x: I | O = input;
+    let x = input;
     for (let i = 0; i < this.actions.length; i++) {
-      x = this.actions[i].apply(x as I) as O;
+      x = this.actions[i].apply(x) as any;
     }
     return (x as unknown) as O;
   }
@@ -74,9 +74,7 @@ export class Bounce<I = any, O extends any = I> implements BounceAction<I, O> {
    * @param modules
    * @returns
    */
-  public static create<I, O>(
-    modules: BounceAction<I | unknown, O | unknown>[]
-  ): Bounce<I, O> {
+  public static create<I, O>(modules: BounceAction<I, O>[]): Bounce<I, O> {
     for (const mod of modules) {
       if (
         typeof mod.apply !== "function" ||
@@ -87,7 +85,7 @@ export class Bounce<I = any, O extends any = I> implements BounceAction<I, O> {
         );
       }
     }
-    return new Bounce(modules);
+    return new Bounce<I, O>(modules);
   }
 }
 
@@ -100,10 +98,12 @@ export class Bounce<I = any, O extends any = I> implements BounceAction<I, O> {
  * @param modules
  * @returns
  */
-export function bounce<I, O>(
-  modules: BounceAction<I | unknown, O | unknown>[]
-) {
-  return Bounce.create<I, O>(modules);
+export function bounce<I, O>(modules: BounceAction[]) {
+  const instance = Bounce.create(modules) as Bounce<I, O>;
+  return {
+    apply: instance.apply.bind(instance),
+    restore: instance.restore.bind(instance),
+  } as Bounce<I, O>;
 }
 
 export default bounce;
