@@ -15,7 +15,8 @@ const packageJson = require("./package.json");
   fs.mkdirSync(path.resolve(__dirname, "./build"));
 
   console.log(` › Compiling Typescript`);
-  execSync(`tsc --outDir build/lib`);
+  execSync(`tsc --outDir build --removeComments`);
+  execSync(`tsc --outDir build  --declaration --emitDeclarationOnly`);
 
   console.log(` › Copying README.md`);
   execSync(
@@ -30,9 +31,9 @@ const packageJson = require("./package.json");
    */
   const cleanedPackageJson = {
     name: packageJson.name,
+    description: packageJson.description,
     version: packageJson.version,
     author: packageJson.author,
-    main: packageJson.main,
     repository: packageJson.repository,
     dependencies: packageJson.dependencies,
     license: packageJson.license,
